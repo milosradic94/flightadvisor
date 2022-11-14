@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/city")
+@RequestMapping("/api/v1/city")
 public class CityController {
 
-    @PostMapping("/add")
+    @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<MessageResponse> addCity() {
         return ResponseEntity.ok(new MessageResponse("Authenticated."));

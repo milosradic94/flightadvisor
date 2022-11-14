@@ -1,6 +1,6 @@
 package com.losmilos.flightadvisor.enumeration;
 
-public enum RoleEnum {
+public enum Role {
 
     ROLE_USER,
     ROLE_ADMIN

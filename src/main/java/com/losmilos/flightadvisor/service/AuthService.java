@@ -1,9 +1,10 @@
 package com.losmilos.flightadvisor.service;
 
-import com.losmilos.flightadvisor.enumeration.RoleEnum;
+import com.losmilos.flightadvisor.enumeration.Role;
 import com.losmilos.flightadvisor.exception.NotFoundException;
 import com.losmilos.flightadvisor.model.domain.Signin;
 import com.losmilos.flightadvisor.model.domain.Signup;
+import com.losmilos.flightadvisor.model.domain.User;
 import com.losmilos.flightadvisor.model.dto.response.MessageResponse;
 import com.losmilos.flightadvisor.model.dto.response.UserResponse;
 import com.losmilos.flightadvisor.model.mapper.SignupMapperImpl;
@@ -43,11 +44,11 @@ public class AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserEntity user = (UserEntity) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtUtils.generateJwtCookie(user).toString())
-                .body(userMapper.domainToResponse(userMapper.entityToDomain(user)));
+                .body(userMapper.domainToResponse(user));
     }
 
     public ResponseEntity<MessageResponse> registerUser(Signup signup) throws NotFoundException {
@@ -57,7 +58,7 @@ public class AuthService {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        user.setRole(roleRepository.findByTitle(RoleEnum.ROLE_USER).orElseThrow(() -> new NotFoundException("Role Not Found.")));
+        user.setRole(roleRepository.findByRole(Role.ROLE_USER).orElseThrow(() -> new NotFoundException("Role Not Found.")));
 
         userRepository.save(user);
 

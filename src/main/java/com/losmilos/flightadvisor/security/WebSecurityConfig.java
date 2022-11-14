@@ -60,8 +60,8 @@ public class WebSecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/signout").authenticated()
-                .antMatchers("/api/auth/**").anonymous()
+                .antMatchers("/api/v1/auth/signout").authenticated()
+                .antMatchers("/api/v1/auth/**").anonymous()
                 .anyRequest().authenticated();
 
         http.authenticationProvider(authenticationProvider());

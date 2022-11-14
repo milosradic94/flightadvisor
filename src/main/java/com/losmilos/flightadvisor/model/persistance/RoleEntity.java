@@ -1,6 +1,6 @@
 package com.losmilos.flightadvisor.model.persistance;
 
-import com.losmilos.flightadvisor.enumeration.RoleEnum;
+import com.losmilos.flightadvisor.enumeration.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +18,7 @@ public class RoleEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RoleEnum title;
+    private Role role;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="role")
     private List<UserEntity> users;

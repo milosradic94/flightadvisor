@@ -1,0 +1,2 @@
+ALTER TABLE `role` CHANGE `title` `role` VARCHAR(255) NOT NULL UNIQUE;
+
