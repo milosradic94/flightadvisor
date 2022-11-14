@@ -1,0 +1,6 @@
+CREATE TABLE role
+(
+    `id` BIGINT AUTO_INCREMENT NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_todo PRIMARY KEY (`id`)
+);
