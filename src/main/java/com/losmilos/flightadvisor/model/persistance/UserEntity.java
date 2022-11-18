@@ -3,6 +3,7 @@ package com.losmilos.flightadvisor.model.persistance;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "user", uniqueConstraints = {
@@ -30,4 +31,7 @@ public class UserEntity  {
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="user")
+    private List<CommentEntity> comments;
 }
