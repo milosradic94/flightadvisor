@@ -1,12 +1,14 @@
 package com.losmilos.flightadvisor.model.persistance;
 
 import com.losmilos.flightadvisor.enumeration.Role;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "role")
 @Getter @Setter
