@@ -4,7 +4,6 @@ import com.losmilos.flightadvisor.model.domain.User;
 import com.losmilos.flightadvisor.model.dto.request.AddCommentRequest;
 import com.losmilos.flightadvisor.model.dto.response.CommentResponse;
 import com.losmilos.flightadvisor.model.mapper.CommentMapperImpl;
-import com.losmilos.flightadvisor.model.persistance.CommentEntity;
 import com.losmilos.flightadvisor.service.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,8 +27,8 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentResponse> addComment(@Valid @RequestBody AddCommentRequest addCommentRequest, @AuthenticationPrincipal User user) {
-        CommentEntity comment = commentService.addComment(commentMapper.dtoToEntity(addCommentRequest), user);
+        final var comment = commentService.addComment(addCommentRequest, user);
 
-        return new ResponseEntity<CommentResponse>(commentMapper.entityToDto(comment), HttpStatus.CREATED);
+        return new ResponseEntity<CommentResponse>(commentMapper.domainToDto(comment), HttpStatus.CREATED);
     }
 }

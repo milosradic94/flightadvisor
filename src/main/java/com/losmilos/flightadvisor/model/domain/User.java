@@ -27,13 +27,13 @@ public class User implements UserDetails {
     @JsonIgnore
     private String password;
 
-    private String role;
+    private Role role;
 
     @Getter(onMethod = @__(@Override))
     private Collection<? extends GrantedAuthority> authorities;
 
     public static User build(User user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole()));
+        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getRole().name()));
 
         return new User(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), authorities);
     }
