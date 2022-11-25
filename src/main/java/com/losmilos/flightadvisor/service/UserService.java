@@ -22,7 +22,7 @@ public class UserService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws NotFoundException {
-        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User Not Found."));
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User Not Found!"));
 
         return User.build(userMapper.entityToDomain(userEntity));
     }

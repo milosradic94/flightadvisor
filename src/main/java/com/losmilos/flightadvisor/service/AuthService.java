@@ -58,7 +58,7 @@ public class AuthService {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
 
-        user.setRole(roleRepository.findByRole(Role.ROLE_USER).orElseThrow(() -> new NotFoundException("Role Not Found.")));
+        user.setRole(roleRepository.findByRole(Role.ROLE_USER).orElseThrow(() -> new NotFoundException("Role Not Found!")));
 
         userRepository.save(user);
 

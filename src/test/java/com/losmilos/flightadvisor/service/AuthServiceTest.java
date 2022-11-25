@@ -139,9 +139,11 @@ public class AuthServiceTest {
     void registerUser_ShouldThrowNotFoundException_WhenRoleDoesntExist() {
         when(signupMapper.domainToEntity(SIGNUP)).thenReturn(USER_ENTITY);
         when(userRepository.existsByUsername(USER_ENTITY.getUsername())).thenReturn(false);
-        when(roleRepository.findByRole(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)).thenThrow(new NotFoundException("Role Not Found."));
+        when(roleRepository.findByRole(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(NotFoundException.class, () -> authService.registerUser(SIGNUP));
+        NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> authService.registerUser(SIGNUP));
+
+        Assertions.assertEquals(notFoundException.getMessage(), "Role Not Found!");
     }
 
     @Test

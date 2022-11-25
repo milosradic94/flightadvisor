@@ -1,10 +1,12 @@
 package com.losmilos.flightadvisor.model.persistance;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "comment")
 @Getter @Setter

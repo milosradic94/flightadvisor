@@ -25,14 +25,14 @@ public class CityServiceTest {
     @InjectMocks
     private CityService cityService;
 
-    private final static City CITY = City.builder()
+    private static final City CITY = City.builder()
             .id(1l)
             .name("DummyName")
             .country("DummyCountry")
             .description("DummyDescription")
             .build();
 
-    private final static CityEntity CITY_ENTITY = CityEntity.builder()
+    private static final CityEntity CITY_ENTITY = CityEntity.builder()
             .id(1l)
             .name("DummyName")
             .country("DummyCountry")
