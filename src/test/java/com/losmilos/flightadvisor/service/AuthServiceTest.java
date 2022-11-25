@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -107,9 +108,19 @@ public class AuthServiceTest {
             .build();
 
     @Test
+    void authenticateUser_ShouldThrowException_WhenUsernameDoesntExist() {
+        when(userRepository.existsByUsername(SIGNIN.getUsername())).thenReturn(false);
+
+        BadCredentialsException badCredentialsException = Assertions.assertThrows(BadCredentialsException.class, () -> authService.authenticateUser(SIGNIN));
+
+        Assertions.assertEquals(badCredentialsException.getMessage(), "Bad credentials");
+    }
+
+    @Test
     void authenticateUser_ShouldReturnResponseEntityOk_WhenUserIsSuccessfullyAuthenticated() {
         final var cookie = ResponseCookie.from("DummyCookie", UUID.randomUUID().toString()).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
 
+        when(userRepository.existsByUsername(SIGNIN.getUsername())).thenReturn(true);
         when(userMapper.domainToResponse(USER)).thenReturn(USER_RESPONSE);
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(SIGNIN.getUsername(), SIGNIN.getPassword()))).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(USER);
