@@ -1,11 +1,13 @@
 package com.losmilos.flightadvisor.model.persistance;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "city")
 @Getter @Setter
