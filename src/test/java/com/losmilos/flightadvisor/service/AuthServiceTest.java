@@ -61,76 +61,75 @@ public class AuthServiceTest {
     @InjectMocks
     private AuthService authService;
 
+    private static final Role ROLE = Role.builder()
+            .id(1l)
+            .role(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)
+            .build();
+
+    private static final User USER = User.builder()
+            .id(1l)
+            .username("DummyUsername")
+            .password("DummyPassword")
+            .role(ROLE)
+            .authorities(Collections.singletonList(new SimpleGrantedAuthority(ROLE.getRole().name())))
+            .build();
+
+    private static final Signin SIGNIN = Signin.builder()
+            .username(USER.getUsername())
+            .password(USER.getPassword())
+            .build();
+
+    private static final UserResponse USER_RESPONSE = UserResponse.builder()
+            .id(USER.getId())
+            .username(USER.getUsername())
+            .role(USER.getRole().getRole().name())
+            .build();
+
+    private static final RoleEntity ROLE_ENTITY = RoleEntity.builder()
+            .id(1l)
+            .role(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)
+            .build();
+
+    private static final Signup SIGNUP = Signup.builder()
+            .firstName("DummyFirstName")
+            .lastName("DummyLastName")
+            .username("DummyUsername")
+            .password("DummyPassword")
+            .build();
+
+    private static final UserEntity USER_ENTITY = UserEntity.builder()
+            .id(1l)
+            .firstName("DummyFirstName")
+            .lastName("DummyLastName")
+            .username("DummyUsername")
+            .password("DummyPassword")
+            .role(ROLE_ENTITY)
+            .build();
+
     @Test
     void authenticateUser_ShouldReturnResponseEntityOk_WhenUserIsSuccessfullyAuthenticated() {
-        final var role = Role.builder()
-                .id(1l)
-                .role(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)
-                .build();
-
-        final var user = User.builder()
-                .id(1l)
-                .username("DummyUsername")
-                .password("DummyPassword")
-                .role(role)
-                .authorities(Collections.singletonList(new SimpleGrantedAuthority(role.getRole().name())))
-                .build();
-
-        final var signin = Signin.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .build();
-
         final var cookie = ResponseCookie.from("DummyCookie", UUID.randomUUID().toString()).path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
 
-        final var userResponse = UserResponse.builder()
-                        .id(user.getId())
-                        .username(user.getUsername())
-                        .role(user.getRole().getRole().name())
-                        .build();
+        when(userMapper.domainToResponse(USER)).thenReturn(USER_RESPONSE);
+        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(SIGNIN.getUsername(), SIGNIN.getPassword()))).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(USER);
+        when(jwtUtils.generateJwtCookie(USER)).thenReturn(cookie);
 
-        when(userMapper.domainToResponse(user)).thenReturn(userResponse);
-        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signin.getUsername(), signin.getPassword()))).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(user);
-        when(jwtUtils.generateJwtCookie(user)).thenReturn(cookie);
-
-        final var responseEntity = authService.authenticateUser(signin);
+        final var responseEntity = authService.authenticateUser(SIGNIN);
 
         Assertions.assertEquals(cookie.toString(), responseEntity.getHeaders().getFirst(HttpHeaders.SET_COOKIE));
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        Assertions.assertEquals(userResponse, responseEntity.getBody());
+        Assertions.assertEquals(USER_RESPONSE, responseEntity.getBody());
     }
 
     @Test
     void registerUser_ShouldReturnResponseEntityBadRequest_WhenUserAlreadyExists() {
         final var body = new MessageResponse("Error: Username is already taken!");
 
-        final var role = RoleEntity.builder()
-                .id(1l)
-                .role(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)
-                .build();
+        when(signupMapper.domainToEntity(SIGNUP)).thenReturn(USER_ENTITY);
+        when(userRepository.existsByUsername(USER_ENTITY.getUsername())).thenReturn(true);
 
-        final var signup = Signup.builder()
-                .firstName("DummyFirstName")
-                .lastName("DummyLastName")
-                .username("DummyUsername")
-                .password("DummyPassword")
-                .build();
-
-        final var user = UserEntity.builder()
-                .id(1l)
-                .firstName("DummyFirstName")
-                .lastName("DummyLastName")
-                .username("DummyUsername")
-                .password("DummyPassword")
-                .role(role)
-                .build();
-
-
-        when(signupMapper.domainToEntity(signup)).thenReturn(user);
-        when(userRepository.existsByUsername(user.getUsername())).thenReturn(true);
-
-        final var responseEntity = authService.registerUser(signup);
+        final var responseEntity = authService.registerUser(SIGNUP);
 
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         Assertions.assertEquals(body.getMessage(), responseEntity.getBody().getMessage());
@@ -138,66 +137,22 @@ public class AuthServiceTest {
 
     @Test
     void registerUser_ShouldThrowNotFoundException_WhenRoleDoesntExist() {
-        final var role = RoleEntity.builder()
-                .id(1l)
-                .role(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)
-                .build();
-
-        final var signup = Signup.builder()
-                .firstName("DummyFirstName")
-                .lastName("DummyLastName")
-                .username("DummyUsername")
-                .password("DummyPassword")
-                .build();
-
-        final var user = UserEntity.builder()
-                .id(1l)
-                .firstName("DummyFirstName")
-                .lastName("DummyLastName")
-                .username("DummyUsername")
-                .password("DummyPassword")
-                .role(role)
-                .build();
-
-
-        when(signupMapper.domainToEntity(signup)).thenReturn(user);
-        when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
+        when(signupMapper.domainToEntity(SIGNUP)).thenReturn(USER_ENTITY);
+        when(userRepository.existsByUsername(USER_ENTITY.getUsername())).thenReturn(false);
         when(roleRepository.findByRole(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)).thenThrow(new NotFoundException("Role Not Found."));
 
-        Assertions.assertThrows(NotFoundException.class, () -> authService.registerUser(signup));
+        Assertions.assertThrows(NotFoundException.class, () -> authService.registerUser(SIGNUP));
     }
 
     @Test
     void registerUser_ShouldReturnResponseEntityOk_WhenUserIsSuccessfullyRegistered() {
         final var body = new MessageResponse("User registered successfully!");
 
-        final var role = RoleEntity.builder()
-                .id(1l)
-                .role(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)
-                .build();
+        when(signupMapper.domainToEntity(SIGNUP)).thenReturn(USER_ENTITY);
+        when(userRepository.existsByUsername(USER_ENTITY.getUsername())).thenReturn(false);
+        when(roleRepository.findByRole(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)).thenReturn(Optional.of(ROLE_ENTITY));
 
-        final var signup = Signup.builder()
-                .firstName("DummyFirstName")
-                .lastName("DummyLastName")
-                .username("DummyUsername")
-                .password("DummyPassword")
-                .build();
-
-        final var user = UserEntity.builder()
-                .id(1l)
-                .firstName("DummyFirstName")
-                .lastName("DummyLastName")
-                .username("DummyUsername")
-                .password("DummyPassword")
-                .role(role)
-                .build();
-
-
-        when(signupMapper.domainToEntity(signup)).thenReturn(user);
-        when(userRepository.existsByUsername(user.getUsername())).thenReturn(false);
-        when(roleRepository.findByRole(com.losmilos.flightadvisor.enumeration.Role.ROLE_USER)).thenReturn(Optional.of(role));
-
-        final var responseEntity = authService.registerUser(signup);
+        final var responseEntity = authService.registerUser(SIGNUP);
 
         Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         Assertions.assertEquals(body.getMessage(), responseEntity.getBody().getMessage());
