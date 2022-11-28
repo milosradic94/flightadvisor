@@ -4,8 +4,10 @@ import com.losmilos.flightadvisor.exception.NotFoundException;
 import com.losmilos.flightadvisor.model.domain.Comment;
 import com.losmilos.flightadvisor.model.domain.User;
 import com.losmilos.flightadvisor.model.dto.request.AddCommentRequest;
+import com.losmilos.flightadvisor.model.dto.request.UpdateCommentRequest;
 import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.model.mapper.CommentMapperImpl;
+import com.losmilos.flightadvisor.model.persistance.CommentEntity;
 import com.losmilos.flightadvisor.repository.CityRepository;
 import com.losmilos.flightadvisor.repository.CommentRepository;
 import lombok.AllArgsConstructor;
@@ -37,5 +39,28 @@ public class CommentService {
                         .build();
 
         return commentMapper.entityToDomain(commentRepository.save(commentMapper.domainToEntity(comment)));
+    }
+
+    public Comment updateComment(UpdateCommentRequest updateCommentRequest, User user) {
+        final var city =
+                cityRepository.findById(updateCommentRequest.getCityId())
+                        .orElseThrow(() -> new NotFoundException("City Not Found!"));
+
+        final var commentEntity =
+                commentRepository.findByIdAndUserId(updateCommentRequest.getId(), user.getId())
+                        .orElseThrow(() -> new NotFoundException("Comment Not Found!"));;
+
+        commentEntity.setCity(city);
+        commentEntity.setDescription(updateCommentRequest.getDescription());
+
+        return commentMapper.entityToDomain(commentRepository.save(commentEntity));
+    }
+
+    public void deleteByIdAndUser(Long id, User user) {
+        final var commentEntity =
+                commentRepository.findByIdAndUserId(id, user.getId())
+                        .orElseThrow(() -> new NotFoundException("Comment Not Found!"));
+
+        commentRepository.delete(commentEntity);
     }
 }

@@ -1,7 +1,7 @@
 package com.losmilos.flightadvisor.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.losmilos.flightadvisor.exception.NotFoundException;
 import com.losmilos.flightadvisor.model.domain.City;
@@ -9,6 +9,7 @@ import com.losmilos.flightadvisor.model.domain.Comment;
 import com.losmilos.flightadvisor.model.domain.Role;
 import com.losmilos.flightadvisor.model.domain.User;
 import com.losmilos.flightadvisor.model.dto.request.AddCommentRequest;
+import com.losmilos.flightadvisor.model.dto.request.UpdateCommentRequest;
 import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.model.mapper.CommentMapperImpl;
 import com.losmilos.flightadvisor.model.persistance.CityEntity;
@@ -106,6 +107,12 @@ public class CommentServiceTest {
             .user(USER_ENTITY)
             .build();
 
+    private static final UpdateCommentRequest UPDATE_COMMENT_REQUEST = UpdateCommentRequest.builder()
+            .id(1l)
+            .description("DummyDescription")
+            .cityId(1l)
+            .build();
+
     @Test
     void addComment_ShouldThrowException_WhenCityDoesntExist() {
         when(cityRepository.findById(ADD_COMMENT_REQUEST.getCityId())).thenReturn(Optional.empty());
@@ -126,5 +133,58 @@ public class CommentServiceTest {
         final var comment = commentService.addComment(ADD_COMMENT_REQUEST, USER);
 
         Assertions.assertEquals(comment, COMMENT);
+    }
+
+    @Test
+    void updateComment_ShouldThrowException_WhenCityDoesntExist() {
+        when(cityRepository.findById(UPDATE_COMMENT_REQUEST.getCityId())).thenReturn(Optional.empty());
+
+        NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> commentService.updateComment(UPDATE_COMMENT_REQUEST, USER));
+
+        Assertions.assertEquals(notFoundException.getMessage(), "City Not Found!");
+    }
+
+    @Test
+    void updateComment_ShouldThrowException_WhenCommentDoesntExist() {
+        when(cityRepository.findById(ADD_COMMENT_REQUEST.getCityId())).thenReturn(Optional.of(CITY_ENTITY));
+        when(commentRepository.findByIdAndUserId(UPDATE_COMMENT_REQUEST.getId(), USER.getId())).thenReturn(Optional.empty());
+
+        NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> commentService.updateComment(UPDATE_COMMENT_REQUEST, USER));
+
+        Assertions.assertEquals(notFoundException.getMessage(), "Comment Not Found!");
+    }
+
+    @Test
+    void updateComment_ShouldReturnCommentDomain_WhenCommentIsSuccessfullyEdited() {
+        when(cityRepository.findById(UPDATE_COMMENT_REQUEST.getCityId())).thenReturn(Optional.of(CITY_ENTITY));
+        when(commentRepository.findByIdAndUserId(UPDATE_COMMENT_REQUEST.getCityId(), USER.getId())).thenReturn(Optional.of(COMMENT_ENTITY));
+        when(commentRepository.save(COMMENT_ENTITY)).thenReturn(COMMENT_ENTITY);
+        when(commentMapper.entityToDomain(COMMENT_ENTITY)).thenReturn(COMMENT);
+
+        final var comment = commentService.updateComment(UPDATE_COMMENT_REQUEST, USER);
+
+        Assertions.assertEquals(comment, COMMENT);
+    }
+
+
+
+
+
+    @Test
+    void deleteByIdAndUser_ShouldThrowException_WhenCommentDoesntExist() {
+        when(commentRepository.findByIdAndUserId(1l, USER.getId())).thenReturn(Optional.empty());
+
+        NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> commentService.deleteByIdAndUser(1l, USER));
+
+        Assertions.assertEquals(notFoundException.getMessage(), "Comment Not Found!");
+    }
+
+    @Test
+    void deleteByIdAndUser_ShouldExecuteDelete_WhenCommentIsSuccessfullyDeleted() {
+        when(commentRepository.findByIdAndUserId(1l, USER.getId())).thenReturn(Optional.of(COMMENT_ENTITY));
+
+        commentService.deleteByIdAndUser(1l, USER);
+
+        verify(commentRepository).delete(COMMENT_ENTITY);
     }
 }
