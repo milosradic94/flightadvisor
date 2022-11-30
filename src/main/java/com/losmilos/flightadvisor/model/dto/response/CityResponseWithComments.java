@@ -1,4 +1,4 @@
-package com.losmilos.flightadvisor.model.domain;
+package com.losmilos.flightadvisor.model.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 @Getter @Setter
-public class City {
+public class CityResponseWithComments {
 
     private Long id;
 
@@ -18,5 +18,5 @@ public class City {
 
     private String description;
 
-    private List<Comment> comments;
+    private List<CommentResponse> comments;
 }

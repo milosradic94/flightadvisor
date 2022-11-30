@@ -3,18 +3,17 @@ package com.losmilos.flightadvisor.api.v1;
 import com.losmilos.flightadvisor.model.domain.City;
 import com.losmilos.flightadvisor.model.dto.request.CityRequest;
 import com.losmilos.flightadvisor.model.dto.response.CityResponse;
+import com.losmilos.flightadvisor.model.dto.response.CityResponseWithComments;
 import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.service.CityService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -31,5 +30,12 @@ public class CityController {
         City city = cityService.addCity(cityMapper.dtoToDomain(cityRequest));
 
         return new ResponseEntity<CityResponse>(cityMapper.domainToDto(city), HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CityResponseWithComments>> getCities(@RequestParam(required = false) String search, @RequestParam(required = false) Integer numberOfComments) {
+        final var cities = cityService.getCities(search, numberOfComments);
+
+        return new ResponseEntity<List<CityResponseWithComments>>(cities, HttpStatus.OK);
     }
 }

@@ -1,5 +1,6 @@
 package com.losmilos.flightadvisor.model.persistance;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,5 +28,6 @@ public class CityEntity {
     private String description;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="city")
+    @JsonManagedReference
     private List<CommentEntity> comments;
 }

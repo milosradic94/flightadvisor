@@ -1,5 +1,6 @@
 package com.losmilos.flightadvisor.model.persistance;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.losmilos.flightadvisor.enumeration.Role;
 import lombok.*;
 
@@ -23,5 +24,6 @@ public class RoleEntity {
     private Role role;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="role")
+    @JsonBackReference
     private List<UserEntity> users;
 }
