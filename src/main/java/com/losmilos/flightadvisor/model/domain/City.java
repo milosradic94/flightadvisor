@@ -4,8 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Builder
 @Getter @Setter
 public class City {
@@ -17,6 +15,4 @@ public class City {
     private String country;
 
     private String description;
-
-    private List<Comment> comments;
 }
