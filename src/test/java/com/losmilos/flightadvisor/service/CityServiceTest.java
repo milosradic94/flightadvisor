@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,6 +73,8 @@ public class CityServiceTest {
             .description("DummyDescription")
             .city(CITY_ENTITY)
             .user(USER_ENTITY)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .build();
 
     private static final CommentResponse COMMENT_RESPONSE = CommentResponse.builder()
@@ -80,6 +82,8 @@ public class CityServiceTest {
             .description("DummyDescription")
             .userId(1l)
             .cityId(1l)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .build();
 
     private static final CityResponseWithComments CITY_RESPONSE_WITH_COMMENTS = CityResponseWithComments.builder()

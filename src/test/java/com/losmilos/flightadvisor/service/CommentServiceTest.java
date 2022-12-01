@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -98,6 +99,8 @@ public class CommentServiceTest {
             .description("DummyDescription")
             .city(CITY)
             .user(USER)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .build();
 
     private static final CommentEntity COMMENT_ENTITY = CommentEntity.builder()
@@ -105,6 +108,8 @@ public class CommentServiceTest {
             .description("DummyDescription")
             .city(CITY_ENTITY)
             .user(USER_ENTITY)
+            .createdAt(LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .build();
 
     private static final UpdateCommentRequest UPDATE_COMMENT_REQUEST = UpdateCommentRequest.builder()

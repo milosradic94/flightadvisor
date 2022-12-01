@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter @Setter
 public class Comment {
@@ -15,4 +17,8 @@ public class Comment {
     private City city;
 
     private User user;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }
