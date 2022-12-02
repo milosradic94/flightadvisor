@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
@@ -94,7 +95,7 @@ public class CityServiceTest {
             .comments(Collections.singletonList(COMMENT_RESPONSE))
             .build();
 
-    private static final List<CommentEntity> COMMENT_ENTITY_LIST = Collections.singletonList(COMMENT_ENTITY);
+    private static final Page<CommentEntity> COMMENT_ENTITY_PAGE = new PageImpl<>(List.of(COMMENT_ENTITY));
 
     private static final List<CityEntity> CITY_ENTITY_LIST = Collections.singletonList(CITY_ENTITY);
 
@@ -114,10 +115,10 @@ public class CityServiceTest {
     @Test
     void getCities_ShouldReturnCities_WhenAllParametersAreNull() {
         when(cityRepository.findAll()).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId())).thenReturn(COMMENT_ENTITY_LIST);
+        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
-        final var cities = cityService.getCities(null, null);
+        final var cities = cityService.getCities(null, Integer.MAX_VALUE);
 
         Assertions.assertEquals(cities, CITY_RESPONSE_WITH_COMMENTS_LIST);
     }
@@ -125,7 +126,7 @@ public class CityServiceTest {
     @Test
     void getCities_ShouldReturnCities_WhenAllParametersAreNotNull() {
         when(cityRepository.findAllByNameIsContaining("a")).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(Page.empty());
+        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities("a", 1);
@@ -134,12 +135,12 @@ public class CityServiceTest {
     }
 
     @Test
-    void getCities_ShouldReturnCities_WhenSearchIsNotNull() {
+    void getCities_ShouldReturnCities_WhenSearchByNameIsNotNull() {
         when(cityRepository.findAllByNameIsContaining("a")).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId())).thenReturn(COMMENT_ENTITY_LIST);
+        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
-        final var cities = cityService.getCities("a", null);
+        final var cities = cityService.getCities("a", Integer.MAX_VALUE);
 
         Assertions.assertEquals(cities, CITY_RESPONSE_WITH_COMMENTS_LIST);
     }
@@ -147,7 +148,7 @@ public class CityServiceTest {
     @Test
     void getCities_ShouldReturnCities_WhenNumberOfCommentsIsNotNull() {
         when(cityRepository.findAll()).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(Page.empty());
+        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities(null, 1);

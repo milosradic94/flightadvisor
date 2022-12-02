@@ -34,7 +34,7 @@ public class CommentController {
     public ResponseEntity<CommentResponse> updateComment(@Valid @RequestBody UpdateCommentRequest updateCommentRequest, @AuthenticationPrincipal User user) {
         final var comment = commentService.updateComment(updateCommentRequest, user);
 
-        return new ResponseEntity<CommentResponse>(commentMapper.domainToDto(comment), HttpStatus.OK);
+        return ResponseEntity.ok(commentMapper.domainToDto(comment));
     }
 
     @DeleteMapping("/{id}")

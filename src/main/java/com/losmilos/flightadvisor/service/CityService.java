@@ -29,15 +29,12 @@ public class CityService {
         return cityMapper.entityToDomain(cityEntity);
     }
 
-    public List<CityResponseWithComments> getCities(String search, Integer numberOfComments) {
-        final var cities = search != null ? cityRepository.findAllByNameIsContaining(search) : cityRepository.findAll();
+    public List<CityResponseWithComments> getCities(String searchByName, Integer numberOfComments) {
+        final var cities = searchByName != null ? cityRepository.findAllByNameIsContaining(searchByName) : cityRepository.findAll();
 
         for (var city:
              cities) {
-            if(numberOfComments != null)
-                city.setComments(commentRepository.findAllByCityIdOrderByIdDesc(city.getId(), PageRequest.of(0, numberOfComments)).stream().collect(Collectors.toList()));
-            else
-                city.setComments(commentRepository.findAllByCityIdOrderByIdDesc(city.getId()));
+            city.setComments(commentRepository.findAllByCityIdOrderByIdDesc(city.getId(), PageRequest.of(0, numberOfComments)).stream().collect(Collectors.toList()));
         }
 
         return cities.stream().map(cityMapper::entityToResponse).toList();

@@ -7,11 +7,11 @@ import com.losmilos.flightadvisor.model.dto.request.AddCommentRequest;
 import com.losmilos.flightadvisor.model.dto.request.UpdateCommentRequest;
 import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.model.mapper.CommentMapperImpl;
-import com.losmilos.flightadvisor.model.persistance.CommentEntity;
 import com.losmilos.flightadvisor.repository.CityRepository;
 import com.losmilos.flightadvisor.repository.CommentRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 @Service
@@ -56,11 +56,8 @@ public class CommentService {
         return commentMapper.entityToDomain(commentRepository.save(commentEntity));
     }
 
+    @Transactional
     public void deleteByIdAndUser(Long id, User user) {
-        final var commentEntity =
-                commentRepository.findByIdAndUserId(id, user.getId())
-                        .orElseThrow(() -> new NotFoundException("Comment Not Found!"));
-
-        commentRepository.delete(commentEntity);
+        commentRepository.deleteByIdAndUserId(id, user.getId());
     }
 }

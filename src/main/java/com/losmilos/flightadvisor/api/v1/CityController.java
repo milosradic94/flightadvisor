@@ -33,9 +33,9 @@ public class CityController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CityResponseWithComments>> getCities(@RequestParam(required = false) String search, @RequestParam(required = false) Integer numberOfComments) {
-        final var cities = cityService.getCities(search, numberOfComments);
+    public ResponseEntity<List<CityResponseWithComments>> getCities(@RequestParam(required = false) String searchByName, @RequestParam(required = false, value = "numberOfComments", defaultValue = Integer.MAX_VALUE + "") Integer numberOfComments) {
+        final var cities = cityService.getCities(searchByName, numberOfComments);
 
-        return new ResponseEntity<List<CityResponseWithComments>>(cities, HttpStatus.OK);
+        return ResponseEntity.ok(cities);
     }
 }

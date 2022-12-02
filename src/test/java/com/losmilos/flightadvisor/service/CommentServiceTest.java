@@ -171,25 +171,10 @@ public class CommentServiceTest {
         Assertions.assertEquals(comment, COMMENT);
     }
 
-
-
-
-
-    @Test
-    void deleteByIdAndUser_ShouldThrowException_WhenCommentDoesntExist() {
-        when(commentRepository.findByIdAndUserId(1l, USER.getId())).thenReturn(Optional.empty());
-
-        NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> commentService.deleteByIdAndUser(1l, USER));
-
-        Assertions.assertEquals(notFoundException.getMessage(), "Comment Not Found!");
-    }
-
     @Test
     void deleteByIdAndUser_ShouldExecuteDelete_WhenCommentIsSuccessfullyDeleted() {
-        when(commentRepository.findByIdAndUserId(1l, USER.getId())).thenReturn(Optional.of(COMMENT_ENTITY));
-
         commentService.deleteByIdAndUser(1l, USER);
 
-        verify(commentRepository).delete(COMMENT_ENTITY);
+        verify(commentRepository).deleteByIdAndUserId(1l, USER.getId());
     }
 }
