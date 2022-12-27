@@ -3,7 +3,6 @@ package com.losmilos.flightadvisor.service;
 import com.losmilos.flightadvisor.model.domain.Route;
 import com.losmilos.flightadvisor.model.mapper.RouteMapperImpl;
 import com.losmilos.flightadvisor.model.persistance.AirportEntity;
-import com.losmilos.flightadvisor.model.persistance.RouteEntity;
 import com.losmilos.flightadvisor.repository.AirportRepository;
 import com.losmilos.flightadvisor.repository.RouteRepository;
 import com.opencsv.bean.CsvToBean;
@@ -14,12 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -32,41 +31,35 @@ public class RouteService {
     private final RouteMapperImpl routeMapper;
 
     @Async
-    public void importCsv(MultipartFile file) {
-        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            CsvToBean<Route> csvToBean = new CsvToBeanBuilder(reader)
-                    .withType(Route.class)
-                    .build();
+    public void importCsv(MultipartFile file) throws IOException {
+        Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+        CsvToBean<Route> csvToBean = new CsvToBeanBuilder(reader)
+                .withType(Route.class)
+                .build();
 
-            List<Route> routes = csvToBean.parse();
-            List<RouteEntity> routeEntities = new ArrayList<RouteEntity>();
+        List<Route> routes = csvToBean.parse();
 
-            final var airports = airportRepository.findAll();
+        routeRepository.saveAll(
+                routes.stream()
+                        .map(this::mapSourceAndDestinationAirportId)
+                        .filter(route -> !route.getSourceAirportId().equals(0l) && !route.getDestinationAirportId().equals(0L))
+                        .map(routeMapper::domainToEntity)
+                        .collect(Collectors.toList()));
+    }
 
-            for (Route route:
-                    routes) {
-                Optional<AirportEntity> sourceAirport = airports.stream()
-                        .filter(
-                                airport ->
-                                        airport.getId().equals(route.getSourceAirportId()) &&
-                                                (airport.getIata().equalsIgnoreCase(route.getSourceAirport()) ||
-                                                        airport.getIcao().equalsIgnoreCase(route.getSourceAirport())))
-                        .findFirst();
+    private Route mapSourceAndDestinationAirportId(Route route) {
+        Optional<AirportEntity> sourceAirport = airportRepository.findById(route.getSourceAirportId());
+        if(!sourceAirport.isPresent() || (!sourceAirport.get().getIata().equalsIgnoreCase(route.getSourceAirport()) && !sourceAirport.get().getIcao().equalsIgnoreCase(route.getSourceAirport()))) {
+            route.setSourceAirportId(null);
+            return route;
+        }
 
-                Optional<AirportEntity> destinationAirport = airports.stream()
-                        .filter(
-                                airport ->
-                                        airport.getId().equals(route.getDestinationAirportId()) &&
-                                                (airport.getIata().equalsIgnoreCase(route.getDestinationAirport()) ||
-                                                        airport.getIcao().equalsIgnoreCase(route.getDestinationAirport())))
-                        .findFirst();
+        Optional<AirportEntity> destinationAirport = airportRepository.findById(route.getDestinationAirportId());
+        if(!destinationAirport.isPresent() || (!destinationAirport.get().getIata().equalsIgnoreCase(route.getDestinationAirport()) && !destinationAirport.get().getIcao().equalsIgnoreCase(route.getDestinationAirport()))) {
+            route.setDestinationAirportId(null);
+            return route;
+        }
 
-                if(sourceAirport.isPresent() && destinationAirport.isPresent()) {
-                    routeEntities.add(routeMapper.domainToEntity(route));
-                }
-            }
-
-            routeRepository.saveAll(routeEntities);
-        } catch (Exception e) {}
+        return route;
     }
 }

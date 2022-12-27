@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/airport")
@@ -21,7 +23,7 @@ public class AirportController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<MessageResponse> importAirports(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<MessageResponse> importAirports(@RequestParam("file") MultipartFile file) throws IOException {
         airportService.importCsv(file);
         return new ResponseEntity<MessageResponse>(new MessageResponse("CSV will be parsed in background!"), HttpStatus.CREATED);
     }
