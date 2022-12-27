@@ -1,6 +1,7 @@
 package com.losmilos.flightadvisor.service;
 
 import com.losmilos.flightadvisor.model.domain.Airport;
+import com.losmilos.flightadvisor.model.mapper.AirportMapperImpl;
 import com.losmilos.flightadvisor.model.persistance.AirportEntity;
 import com.losmilos.flightadvisor.model.persistance.CityEntity;
 import com.losmilos.flightadvisor.repository.AirportRepository;
@@ -27,6 +28,8 @@ public class AirportService {
     private final CityRepository cityRepository;
     private final AirportRepository airportRepository;
 
+    private final AirportMapperImpl airportMapper;
+
     @Async
     public void importCsv(MultipartFile file) {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -48,7 +51,8 @@ public class AirportService {
                         .findFirst();
 
                 if(city.isPresent()) {
-                    airportEntities.add(airport.domainToEntity(city.get()));
+                    airport.setCityId(city.get().getId());
+                    airportEntities.add(airportMapper.domainToEntity(airport));
                 }
             }
 

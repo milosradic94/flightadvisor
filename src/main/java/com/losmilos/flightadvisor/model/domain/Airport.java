@@ -1,7 +1,5 @@
 package com.losmilos.flightadvisor.model.domain;
 
-import com.losmilos.flightadvisor.model.persistance.AirportEntity;
-import com.losmilos.flightadvisor.model.persistance.CityEntity;
 import com.opencsv.bean.CsvBindByPosition;
 import lombok.*;
 
@@ -51,6 +49,8 @@ public class Airport {
 
     @CsvBindByPosition(position = 13)
     private String source;
+
+    private Long cityId;
 
     public Long getId() {
         return id;
@@ -108,27 +108,13 @@ public class Airport {
         return isValid(source) ? source : null;
     }
 
+    public Long getCityId() {
+        return cityId;
+    }
+
     public boolean isValid(String value) {
         return value != null &&
                 !value.isBlank() &&
                 !value.trim().equals("N");
-    }
-
-    public AirportEntity domainToEntity(CityEntity city) {
-        return AirportEntity.builder()
-                .id(getId())
-                .name(getName())
-                .city(city)
-                .iata(getIata())
-                .icao(getIcao())
-                .latitude(getLatitude())
-                .longitude(getLongitude())
-                .altitude(getAltitude())
-                .timezone(getTimezone())
-                .dst(getDst())
-                .tz(getTz())
-                .type(getType())
-                .source(getSource())
-                .build();
     }
 }

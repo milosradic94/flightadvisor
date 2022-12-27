@@ -1,6 +1,7 @@
 package com.losmilos.flightadvisor.service;
 
 import com.losmilos.flightadvisor.model.domain.Route;
+import com.losmilos.flightadvisor.model.mapper.RouteMapperImpl;
 import com.losmilos.flightadvisor.model.persistance.AirportEntity;
 import com.losmilos.flightadvisor.model.persistance.RouteEntity;
 import com.losmilos.flightadvisor.repository.AirportRepository;
@@ -25,7 +26,10 @@ import java.util.Optional;
 public class RouteService {
 
     private final AirportRepository airportRepository;
+
     private final RouteRepository routeRepository;
+
+    private final RouteMapperImpl routeMapper;
 
     @Async
     public void importCsv(MultipartFile file) {
@@ -58,7 +62,7 @@ public class RouteService {
                         .findFirst();
 
                 if(sourceAirport.isPresent() && destinationAirport.isPresent()) {
-                    routeEntities.add(route.domainToEntity(sourceAirport.get(), destinationAirport.get()));
+                    routeEntities.add(routeMapper.domainToEntity(route));
                 }
             }
 

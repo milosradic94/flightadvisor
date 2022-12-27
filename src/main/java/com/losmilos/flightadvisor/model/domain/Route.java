@@ -1,7 +1,5 @@
 package com.losmilos.flightadvisor.model.domain;
 
-import com.losmilos.flightadvisor.model.persistance.AirportEntity;
-import com.losmilos.flightadvisor.model.persistance.RouteEntity;
 import com.opencsv.bean.CsvBindByPosition;
 import lombok.Setter;
 
@@ -82,18 +80,5 @@ public class Route {
         return value != null &&
                 !value.isBlank() &&
                 !value.trim().equals("N");
-    }
-
-    public RouteEntity domainToEntity(AirportEntity sourceAirport, AirportEntity destinationAirport) {
-        return RouteEntity.builder()
-                .airline(getAirline())
-                .airlineId(getAirlineId())
-                .sourceAirport(sourceAirport)
-                .destinationAirport(destinationAirport)
-                .codeshare(getCodeshare())
-                .stops(getStops())
-                .equipment(getEquipment())
-                .price(getPrice())
-                .build();
     }
 }
