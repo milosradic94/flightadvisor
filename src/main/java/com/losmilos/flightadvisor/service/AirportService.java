@@ -31,20 +31,23 @@ public class AirportService {
     private final AirportMapperImpl airportMapper;
 
     @Async
-    public void importCsv(MultipartFile file) throws IOException {
-        Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-        CsvToBean<Airport> csvToBean = new CsvToBeanBuilder(reader)
-                .withType(Airport.class)
-                .build();
+    public void importCsv(MultipartFile file) {
+        try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            CsvToBean<Airport> csvToBean = new CsvToBeanBuilder(reader)
+                    .withType(Airport.class)
+                    .build();
 
-        List<Airport> airports = csvToBean.parse();
+            List<Airport> airports = csvToBean.parse();
 
-        airportRepository.saveAll(
-                airports.stream()
-                        .map(this::mapCityId)
-                        .filter(airport -> airport.getCityId() != null)
-                        .map(airportMapper::domainToEntity)
-                        .collect(Collectors.toList()));
+            airportRepository.saveAll(
+                    airports.stream()
+                            .map(this::mapCityId)
+                            .filter(airport -> airport.getCityId() != null)
+                            .map(airportMapper::domainToEntity)
+                            .collect(Collectors.toList()));
+        } catch (IOException e) {
+            // TODO: 04/01/2023 Send email about failure 
+        }
     }
 
     private Airport mapCityId(Airport airport) {

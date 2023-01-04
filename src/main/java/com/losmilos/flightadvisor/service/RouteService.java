@@ -31,20 +31,23 @@ public class RouteService {
     private final RouteMapperImpl routeMapper;
 
     @Async
-    public void importCsv(MultipartFile file) throws IOException {
-        Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-        CsvToBean<Route> csvToBean = new CsvToBeanBuilder(reader)
-                .withType(Route.class)
-                .build();
+    public void importCsv(MultipartFile file) {
+        try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            CsvToBean<Route> csvToBean = new CsvToBeanBuilder(reader)
+                    .withType(Route.class)
+                    .build();
 
-        List<Route> routes = csvToBean.parse();
+            List<Route> routes = csvToBean.parse();
 
-        routeRepository.saveAll(
-                routes.stream()
-                        .map(this::mapSourceAndDestinationAirportId)
-                        .filter(route -> !route.getSourceAirportId().equals(0l) && !route.getDestinationAirportId().equals(0L))
-                        .map(routeMapper::domainToEntity)
-                        .collect(Collectors.toList()));
+            routeRepository.saveAll(
+                    routes.stream()
+                            .map(this::mapSourceAndDestinationAirportId)
+                            .filter(route -> !route.getSourceAirportId().equals(0l) && !route.getDestinationAirportId().equals(0L))
+                            .map(routeMapper::domainToEntity)
+                            .collect(Collectors.toList()));
+        } catch (IOException e) {
+            // TODO: 04/01/2023 Send email about failure
+        }
     }
 
     private Route mapSourceAndDestinationAirportId(Route route) {
