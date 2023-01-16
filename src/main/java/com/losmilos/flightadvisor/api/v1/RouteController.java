@@ -1,5 +1,6 @@
 package com.losmilos.flightadvisor.api.v1;
 
+import com.losmilos.flightadvisor.model.dto.response.CheapestFlightResponse;
 import com.losmilos.flightadvisor.model.dto.response.MessageResponse;
 import com.losmilos.flightadvisor.service.RouteService;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,9 @@ public class RouteController {
     private final RouteService routeService;
 
     @GetMapping
-    public ResponseEntity<?> getCheapestFlight(@RequestParam Long sourceCityId, @RequestParam Long destinationCityId)
+    public ResponseEntity<CheapestFlightResponse> getCheapestFlight(@RequestParam Long sourceCityId, @RequestParam Long destinationCityId)
     {
-        return routeService.findCheapestFlight(sourceCityId, destinationCityId);
+        return ResponseEntity.ok(routeService.findCheapestFlight(sourceCityId, destinationCityId));
     }
 
     @PostMapping

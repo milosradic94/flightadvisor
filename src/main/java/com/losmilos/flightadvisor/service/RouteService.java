@@ -7,7 +7,6 @@ import com.losmilos.flightadvisor.model.domain.dijkstra.Edge;
 import com.losmilos.flightadvisor.model.domain.dijkstra.Graph;
 import com.losmilos.flightadvisor.model.domain.dijkstra.Vertex;
 import com.losmilos.flightadvisor.model.dto.response.CheapestFlightResponse;
-import com.losmilos.flightadvisor.model.dto.response.MessageResponse;
 import com.losmilos.flightadvisor.model.mapper.RouteMapperImpl;
 import com.losmilos.flightadvisor.model.persistance.AirportEntity;
 import com.losmilos.flightadvisor.repository.AirportRepository;
@@ -16,7 +15,6 @@ import com.losmilos.flightadvisor.repository.RouteRepository;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +41,7 @@ public class RouteService {
 
     private final CityRepository cityRepository;
 
-    public ResponseEntity<?> findCheapestFlight(Long sourceCityId, Long destinationCityId)
+    public CheapestFlightResponse findCheapestFlight(Long sourceCityId, Long destinationCityId)
     {
         final var sourceCity =
                 cityRepository.findById(sourceCityId)
@@ -61,15 +59,17 @@ public class RouteService {
                 .filter(airport -> airport.getCity().getId().equals(sourceCity.getId()))
                 .collect(Collectors.toList());
 
-        if(sourceAirports.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Source City doesn't have airports!"));
+        if(sourceAirports.isEmpty()) {
+            throw new NotFoundException("Source City Airports Not Found!");
+        }
 
         final var destinationAirports = airports.stream()
                 .filter(airport -> airport.getCity().getId().equals(destinationCity.getId()))
                 .collect(Collectors.toList());
 
-        if(destinationAirports.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Destination City doesn't have airports!"));
+        if(destinationAirports.isEmpty()) {
+            throw new NotFoundException("Destination City Airports Not Found!");
+        }
 
         final var nodes = airports.stream()
                 .map(airport -> new Vertex(
@@ -103,14 +103,15 @@ public class RouteService {
                         a.stream().map(Edge::getPrice).reduce(0d, (priceA, priceB) -> priceA + priceB) >
                                 b.stream().map(Edge::getPrice).reduce(0d, (priceA, priceB) -> priceA + priceB) ? a : b);
 
-        if(shortestRoute.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Route can not be found!"));
+        if(shortestRoute.isEmpty()) {
+            throw new NotFoundException("Route Not Found!");
+        }
 
-        return ResponseEntity.ok(CheapestFlightResponse.builder()
+        return CheapestFlightResponse.builder()
             .routes(shortestRoute.stream().map(routeMapper::edgeToRoute).collect(Collectors.toList()))
             .total(shortestRoute.stream().map(Edge::getPrice).reduce(0d, (a, b) -> a + b))
             .steps(shortestRoute.size())
-            .build());
+            .build();
     }
 
     @Async
