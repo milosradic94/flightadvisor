@@ -62,7 +62,8 @@ public class WebSecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/api/v1/auth/signout").authenticated()
                 .antMatchers("/api/v1/auth/**").anonymous()
-                .anyRequest().authenticated();
+                .antMatchers("/api/v1/**").authenticated()
+                .anyRequest().permitAll();
 
         http.authenticationProvider(authenticationProvider());
 

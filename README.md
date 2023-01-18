@@ -19,3 +19,7 @@ password: `12345678`
 
 username: `user`
 password: `12345678`
+
+## API Documentation
+
+http://localhost:6868/swagger-ui/index.html
