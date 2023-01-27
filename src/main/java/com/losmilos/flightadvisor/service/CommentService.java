@@ -9,7 +9,9 @@ import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.model.mapper.CommentMapperImpl;
 import com.losmilos.flightadvisor.repository.CityRepository;
 import com.losmilos.flightadvisor.repository.CommentRepository;
+import com.losmilos.flightadvisor.utility.Constants.CacheNames;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class CommentService {
 
     private final CityMapperImpl cityMapper;
 
+    @CacheEvict(value = CacheNames.CITIES_WITH_COMMENTS, allEntries = true)
     public Comment addComment(AddCommentRequest addCommentRequest, User user) {
         final var city =
                 cityRepository.findById(addCommentRequest.getCityId())
@@ -57,6 +60,7 @@ public class CommentService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheNames.CITIES_WITH_COMMENTS, allEntries = true)
     public void deleteByIdAndUser(Long id, User user) {
         commentRepository.deleteByIdAndUserId(id, user.getId());
     }

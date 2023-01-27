@@ -6,7 +6,9 @@ import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.model.persistance.CityEntity;
 import com.losmilos.flightadvisor.repository.CityRepository;
 import com.losmilos.flightadvisor.repository.CommentRepository;
+import com.losmilos.flightadvisor.utility.Constants.CacheNames;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class CityService {
         return cityMapper.entityToDomain(cityEntity);
     }
 
+    @Cacheable(value = CacheNames.CITIES_WITH_COMMENTS)
     public List<CityResponseWithComments> getCities(String searchByName, Integer numberOfComments) {
         final var cities = searchByName != null ? cityRepository.findAllByNameIsContaining(searchByName) : cityRepository.findAll();
 
