@@ -2,6 +2,15 @@ version: "3.8"
 
 services:
 
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - cache:/data
+
   mysqldb:
     image: mariadb:10.4.21
     restart: unless-stopped
@@ -22,6 +31,8 @@ services:
     depends_on:
       mysqldb:
         condition: service_healthy
+      cache:
+        condition: service_started
     build: ./
     restart: on-failure
     ports:
@@ -36,7 +47,10 @@ services:
         "flightadvisor.app.jwtSecret": "3I70uAdMQq5yIl4FeBvjV9faL0PKpxeE",
         "flightadvisor.app.jwtExpirationMs": "86400000",
         "spring.servlet.multipart.max-file-size": "10MB",
-        "spring.servlet.multipart.max-request-size": "10MB"
+        "spring.servlet.multipart.max-request-size": "10MB",
+        "spring.redis.host": "cache",
+        "spring.redis.port": "6379",
+        "spring.redis.password": "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81"
       }'
     volumes:
       - .m2:/root/.m2
@@ -45,3 +59,5 @@ services:
 
 volumes:
   db:
+  cache:
+    driver: local
