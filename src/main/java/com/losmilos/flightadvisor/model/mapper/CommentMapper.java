@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper
 public interface CommentMapper {
 
+    @Mapping(target = "inappropriate", defaultValue = "false")
     CommentEntity domainToEntity(Comment comment);
 
     Comment entityToDomain(CommentEntity commentEntity);
