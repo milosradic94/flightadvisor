@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 @Builder
 @NoArgsConstructor
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "comment")
 @Getter @Setter
+@Audited
 public class CommentEntity {
 
     @Id
@@ -27,11 +30,13 @@ public class CommentEntity {
     @ManyToOne
     @JoinColumn(name = "city_id", nullable = false)
     @JsonBackReference
+    @NotAudited
     private CityEntity city;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonManagedReference
+    @NotAudited
     private UserEntity user;
 
     @Column

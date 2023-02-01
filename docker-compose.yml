@@ -87,7 +87,8 @@ services:
         "spring.cloud.stream.bindings.comments-in-0.destination": "comments",
         "spring.cloud.stream.bindings.comments-in-0.consumer.use-native-decoding": true,
         "spring.cloud.stream.bindings.comments-out-0.destination": "comments",
-        "spring.cloud.stream.bindings.comments-out-0.producer.use-native-encoding": true
+        "spring.cloud.stream.bindings.comments-out-0.producer.use-native-encoding": true,
+        "spring.jpa.properties.org.hibernate.envers.store_data_at_delete": true
       }'
     volumes:
       - .m2:/root/.m2
