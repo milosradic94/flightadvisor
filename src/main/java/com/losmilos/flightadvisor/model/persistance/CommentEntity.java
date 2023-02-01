@@ -41,4 +41,7 @@ public class CommentEntity {
     @Column
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column
+    private Boolean inappropriate;
 }

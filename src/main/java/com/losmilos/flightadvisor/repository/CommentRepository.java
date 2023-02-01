@@ -13,7 +13,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
     Optional<CommentEntity> findByIdAndUserId(Long id, Long userId);
 
-    Page<CommentEntity> findAllByCityIdOrderByIdDesc(Long cityId, Pageable pageable);
+    Page<CommentEntity> findByCityIdAndInappropriateFalseOrderByIdDesc(Long cityId, Pageable pageable);
 
     void deleteByIdAndUserId(Long id, Long cityId);
 }

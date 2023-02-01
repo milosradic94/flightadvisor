@@ -115,7 +115,7 @@ public class CityServiceTest {
     @Test
     void getCities_ShouldReturnCities_WhenAllParametersAreNull() {
         when(cityRepository.findAll()).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities(null, Integer.MAX_VALUE);
@@ -126,7 +126,7 @@ public class CityServiceTest {
     @Test
     void getCities_ShouldReturnCities_WhenAllParametersAreNotNull() {
         when(cityRepository.findAllByNameIsContaining("a")).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities("a", 1);
@@ -137,7 +137,7 @@ public class CityServiceTest {
     @Test
     void getCities_ShouldReturnCities_WhenSearchByNameIsNotNull() {
         when(cityRepository.findAllByNameIsContaining("a")).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities("a", Integer.MAX_VALUE);
@@ -148,7 +148,7 @@ public class CityServiceTest {
     @Test
     void getCities_ShouldReturnCities_WhenNumberOfCommentsIsNotNull() {
         when(cityRepository.findAll()).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findAllByCityIdOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities(null, 1);

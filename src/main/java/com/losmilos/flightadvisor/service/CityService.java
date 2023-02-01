@@ -37,7 +37,7 @@ public class CityService {
 
         for (var city:
              cities) {
-            city.setComments(commentRepository.findAllByCityIdOrderByIdDesc(city.getId(), PageRequest.of(0, numberOfComments)).stream().collect(Collectors.toList()));
+            city.setComments(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(city.getId(), PageRequest.of(0, numberOfComments)).stream().collect(Collectors.toList()));
         }
 
         return cities.stream().map(cityMapper::entityToResponse).toList();
