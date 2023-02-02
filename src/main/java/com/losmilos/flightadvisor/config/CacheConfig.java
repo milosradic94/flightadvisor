@@ -25,9 +25,14 @@ public class CacheConfig extends CachingConfigurerSupport {
   @Value("${spring.redis.port}")
   private int redisPort;
 
+  @Value("${spring.redis.password:#{null}}")
+  private String redisPassword;
+
   @Bean
   public RedisStandaloneConfiguration redisStandaloneConfiguration() {
-    return new RedisStandaloneConfiguration(redisHost, redisPort);
+    var redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
+    redisStandaloneConfiguration.setPassword(redisPassword);
+    return redisStandaloneConfiguration;
   }
 
   @Bean
