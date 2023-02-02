@@ -1,5 +1,6 @@
-package com.losmilos.flightadvisor.exception;
+package com.losmilos.flightadvisor.exception.handler;
 
+import com.losmilos.flightadvisor.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
