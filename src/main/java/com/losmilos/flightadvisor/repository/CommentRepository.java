@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
 
+    <T> Optional<T> findByIdAndUserId(Long id, Long userId, Class<T> type);
+
     Optional<CommentEntity> findByIdAndUserId(Long id, Long userId);
 
     Page<CommentEntity> findByCityIdAndInappropriateFalseOrderByIdDesc(Long cityId, Pageable pageable);

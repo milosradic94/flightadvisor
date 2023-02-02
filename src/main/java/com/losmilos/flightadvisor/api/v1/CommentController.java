@@ -3,6 +3,7 @@ package com.losmilos.flightadvisor.api.v1;
 import com.losmilos.flightadvisor.model.domain.User;
 import com.losmilos.flightadvisor.model.dto.request.AddCommentRequest;
 import com.losmilos.flightadvisor.model.dto.request.UpdateCommentRequest;
+import com.losmilos.flightadvisor.model.dto.response.CommentDescriptionResponse;
 import com.losmilos.flightadvisor.model.dto.response.CommentResponse;
 import com.losmilos.flightadvisor.model.mapper.CommentMapperImpl;
 import com.losmilos.flightadvisor.service.CommentService;
@@ -74,5 +75,23 @@ public class CommentController {
     ResponseEntity<Void> deleteComment(@PathVariable Long id, @AuthenticationPrincipal User user) {
         commentService.deleteByIdAndUser(id, user);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get comment description")
+    @ApiResponse(
+        responseCode = "200",
+        description = "Returns comment description",
+        content = @Content(
+            mediaType = "application/json",
+            schema = @Schema(
+                implementation = CommentDescriptionResponse.class
+            )
+        )
+    )
+    ResponseEntity<CommentDescriptionResponse> getCommentDescription(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        final var commentView = commentService.getCommentDescription(id, user);
+
+        return ResponseEntity.ok(commentMapper.commentViewToCommentDescriptionResponse(commentView));
     }
 }

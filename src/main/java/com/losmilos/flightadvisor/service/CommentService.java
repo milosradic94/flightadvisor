@@ -8,6 +8,7 @@ import com.losmilos.flightadvisor.model.dto.request.AddCommentRequest;
 import com.losmilos.flightadvisor.model.dto.request.UpdateCommentRequest;
 import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.model.mapper.CommentMapperImpl;
+import com.losmilos.flightadvisor.model.view.CommentView;
 import com.losmilos.flightadvisor.repository.CityRepository;
 import com.losmilos.flightadvisor.repository.CommentRepository;
 import com.losmilos.flightadvisor.utility.Constants.CacheNames;
@@ -98,5 +99,10 @@ public class CommentService {
         );
 
         commentRepository.save(commentEntity);
+    }
+
+    public CommentView getCommentDescription(Long id, User user) {
+        return commentRepository.findByIdAndUserId(id, user.getId(), CommentView.class)
+            .orElseThrow(() -> new NotFoundException("Comment Not Found!"));
     }
 }
