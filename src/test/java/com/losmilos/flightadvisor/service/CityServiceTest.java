@@ -11,16 +11,12 @@ import com.losmilos.flightadvisor.model.persistance.CommentEntity;
 import com.losmilos.flightadvisor.model.persistance.RoleEntity;
 import com.losmilos.flightadvisor.model.persistance.UserEntity;
 import com.losmilos.flightadvisor.repository.CityRepository;
-import com.losmilos.flightadvisor.repository.CommentRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -33,22 +29,12 @@ public class CityServiceTest {
     private CityRepository cityRepository;
 
     @Mock
-    private CommentRepository commentRepository;
-
-    @Mock
     private CityMapperImpl cityMapper;
 
     @InjectMocks
     private CityService cityService;
 
     private static final City CITY = City.builder()
-            .id(1l)
-            .name("DummyName")
-            .country("DummyCountry")
-            .description("DummyDescription")
-            .build();
-
-    private static final CityEntity CITY_ENTITY = CityEntity.builder()
             .id(1l)
             .name("DummyName")
             .country("DummyCountry")
@@ -69,15 +55,6 @@ public class CityServiceTest {
             .role(ROLE_ENTITY)
             .build();
 
-    private static final CommentEntity COMMENT_ENTITY = CommentEntity.builder()
-            .id(1l)
-            .description("DummyDescription")
-            .city(CITY_ENTITY)
-            .user(USER_ENTITY)
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .build();
-
     private static final CommentResponse COMMENT_RESPONSE = CommentResponse.builder()
             .id(1l)
             .description("DummyDescription")
@@ -95,7 +72,21 @@ public class CityServiceTest {
             .comments(Collections.singletonList(COMMENT_RESPONSE))
             .build();
 
-    private static final Page<CommentEntity> COMMENT_ENTITY_PAGE = new PageImpl<>(List.of(COMMENT_ENTITY));
+    private static final List<CommentEntity> COMMENT_ENTITY_LIST = Collections.singletonList(CommentEntity.builder()
+        .id(1l)
+        .description("DummyDescription")
+        .user(USER_ENTITY)
+        .createdAt(LocalDateTime.now())
+        .updatedAt(LocalDateTime.now())
+        .build());
+
+    private static final CityEntity CITY_ENTITY = CityEntity.builder()
+        .id(1l)
+        .name("DummyName")
+        .country("DummyCountry")
+        .description("DummyDescription")
+        .comments(COMMENT_ENTITY_LIST)
+        .build();
 
     private static final List<CityEntity> CITY_ENTITY_LIST = Collections.singletonList(CITY_ENTITY);
 
@@ -114,8 +105,7 @@ public class CityServiceTest {
 
     @Test
     void getCities_ShouldReturnCities_WhenAllParametersAreNull() {
-        when(cityRepository.findAll()).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(cityRepository.findAllWithComments()).thenReturn(CITY_ENTITY_LIST);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities(null, Integer.MAX_VALUE);
@@ -125,8 +115,7 @@ public class CityServiceTest {
 
     @Test
     void getCities_ShouldReturnCities_WhenAllParametersAreNotNull() {
-        when(cityRepository.findAllByNameIsContaining("a")).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(cityRepository.findAllByNameIsContainingWithComments("a")).thenReturn(CITY_ENTITY_LIST);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities("a", 1);
@@ -136,8 +125,7 @@ public class CityServiceTest {
 
     @Test
     void getCities_ShouldReturnCities_WhenSearchByNameIsNotNull() {
-        when(cityRepository.findAllByNameIsContaining("a")).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, Integer.MAX_VALUE))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(cityRepository.findAllByNameIsContainingWithComments("a")).thenReturn(CITY_ENTITY_LIST);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities("a", Integer.MAX_VALUE);
@@ -147,8 +135,7 @@ public class CityServiceTest {
 
     @Test
     void getCities_ShouldReturnCities_WhenNumberOfCommentsIsNotNull() {
-        when(cityRepository.findAll()).thenReturn(CITY_ENTITY_LIST);
-        when(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(CITY_ENTITY.getId(), PageRequest.of(0, 1))).thenReturn(COMMENT_ENTITY_PAGE);
+        when(cityRepository.findAllWithComments()).thenReturn(CITY_ENTITY_LIST);
         when(cityMapper.entityToResponse(CITY_ENTITY)).thenReturn(CITY_RESPONSE_WITH_COMMENTS);
 
         final var cities = cityService.getCities(null, 1);

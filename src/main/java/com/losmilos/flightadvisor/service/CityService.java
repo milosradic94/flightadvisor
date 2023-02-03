@@ -5,23 +5,18 @@ import com.losmilos.flightadvisor.model.dto.response.CityResponseWithComments;
 import com.losmilos.flightadvisor.model.mapper.CityMapperImpl;
 import com.losmilos.flightadvisor.model.persistance.CityEntity;
 import com.losmilos.flightadvisor.repository.CityRepository;
-import com.losmilos.flightadvisor.repository.CommentRepository;
 import com.losmilos.flightadvisor.utility.Constants.CacheNames;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class CityService {
 
     private final CityRepository cityRepository;
-
-    private final CommentRepository commentRepository;
 
     private final CityMapperImpl cityMapper;
 
@@ -33,13 +28,21 @@ public class CityService {
 
     @Cacheable(value = CacheNames.CITIES_WITH_COMMENTS)
     public List<CityResponseWithComments> getCities(String searchByName, Integer numberOfComments) {
-        final var cities = searchByName != null ? cityRepository.findAllByNameIsContaining(searchByName) : cityRepository.findAll();
+        final var cities = searchByName != null ? cityRepository.findAllByNameIsContainingWithComments(searchByName) : cityRepository.findAllWithComments();
 
-        for (var city:
-             cities) {
-            city.setComments(commentRepository.findByCityIdAndInappropriateFalseOrderByIdDesc(city.getId(), PageRequest.of(0, numberOfComments)).stream().collect(Collectors.toList()));
-        }
+        return cities.stream()
+            .map(cityEntity -> limitNumberOfComments(cityEntity, numberOfComments))
+            .map(cityMapper::entityToResponse)
+            .toList();
+    }
 
-        return cities.stream().map(cityMapper::entityToResponse).toList();
+    private CityEntity limitNumberOfComments(CityEntity cityEntity, Integer numberOfComments) {
+        cityEntity.setComments(
+            cityEntity.getComments().stream()
+                .limit(numberOfComments)
+            .toList()
+        );
+
+        return cityEntity;
     }
 }

@@ -28,6 +28,7 @@ public class CityEntity {
     private String description;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="city")
+    @OrderBy("id DESC")
     @JsonManagedReference
     private List<CommentEntity> comments;
 }
