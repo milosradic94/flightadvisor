@@ -51,7 +51,7 @@ public class RouteService {
                 cityRepository.findById(destinationCityId)
                         .orElseThrow(() -> new NotFoundException("Destination City Not Found!"));
 
-        final var airports = airportRepository.findAll();
+        final var airports = airportRepository.findAllWithCity();
 
         final var routes = routeRepository.findAll();
 
