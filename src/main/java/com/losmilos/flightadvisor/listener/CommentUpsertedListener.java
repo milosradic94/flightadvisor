@@ -19,7 +19,6 @@ public class CommentUpsertedListener {
     private final CommentMapperImpl commentMapper;
 
     @Async
-    @Transactional
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleEvent(final CommentUpsertedEvent commentUpsertedEvent) {
         kafkaProducer.produceCommentDetails(
